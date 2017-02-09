@@ -1,0 +1,81 @@
+1.导入jar包到工程，也可以添加spring支持，在WEB-INF中编辑A_SpringMVC-servlet.xml文件如下
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:p="http://www.springframework.org/schema/p"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd">
+	<!-- 启动包扫描 -->
+    <context:component-scan base-package="com.springmvc.*"/>
+
+    <!-- viewResolver(视图解析) -->
+    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+    	<property name="viewClass" value="org.springframework.web.servlet.view.JstlView"></property>
+    	<property name="prefix" value="/WEB-INF/page/"></property>
+    	<property name="suffix" value=".jsp"></property>
+    </bean>
+</beans>
+2.在web.xml中配置如下
+<listener>
+		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+	</listener>
+
+	<filter>
+		<filter-name>CharacterEncodingFilter</filter-name>
+		<filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+		<init-param>
+			<param-name>encoding</param-name>
+			<param-value>utf-8</param-value>
+		</init-param>
+	</filter>
+	<filter-mapping>
+		<filter-name>CharacterEncodingFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+
+	<context-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>classpath:applicationContext.xml</param-value>
+	</context-param>
+	<!-- 配置serlvet自启动spring框架里的架包 -->
+	<servlet>
+		<servlet-name>A_SpringMVC</servlet-name>
+		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+
+
+	<servlet-mapping>
+		<servlet-name>A_SpringMVC</servlet-name>
+		<!-- 进入springMVC的匹配规则，可以用/ /XXX* /*.xxx 不可以用/* -->
+		<url-pattern>/</url-pattern>
+	</servlet-mapping>
+3.TestController在类上面添加注解
+	@Controller
+	@RequestMapping("/userController")//第一个字母小写
+	方法的映射配置：
+	@RequestMapping("/hello")
+	@RequestMapping(value = "/login", method = RequestMethod.POST)
+4.获取页面参数的三种方式：
+	1>直接在方法里写参数名，但是要保持和表单中的一致（public String login(String username, String password, Model m)）
+	2>直接在方法里写实体类，但必须要有该实体类（public String login3(User user)）
+	3>直接在方法里写request，request.getParameter获取参数（public String login2(HttpServletRequest request)）
+5.向页面传递参数的方法：
+	a.request.setAttribute
+	b.ModelMap m m.put
+	c.Model m m.addObject("error", "用户名和密码错误")
+6.从一个方法进入另一个方法：
+	return "forward:/userController/hello";
+
+
+
+
+
+
+
+
+
